@@ -7,9 +7,7 @@ import RestaurantItems, {
   localRestaurants,
 } from '../components/home/RestaurantItems';
 import BottomTabs from '../components/home/BottomTabs';
-
-const YELP_API_KEY =
-  'l9_S1wpdDwEiSbDkpQLwDlq_ZgfHhb3fUMf62MGSs0mBftULegaD0VdBpyPGB4O04-IayEE6UgaNK-apcePwxVkqn67funDE82ZTLfcURONsx-4warmtFQrcvRgqYnYx';
+import {YELP_API_KEY} from '../apiKey';
 
 const HomeScreen = ({navigation}) => {
   const [restaurantData, setRestaurantData] = useState(localRestaurants);
