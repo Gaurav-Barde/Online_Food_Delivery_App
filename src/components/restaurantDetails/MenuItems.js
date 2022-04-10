@@ -10,58 +10,9 @@ import React from 'react';
 import BouncyCheckbox from 'react-native-bouncy-checkbox';
 import {useDispatch, useSelector} from 'react-redux';
 
-const foods = [
-  {
-    title: 'Tandoori Chicken',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$14.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-  {
-    title: 'Butter Chicken',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$16.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-  {
-    title: 'Garlic Chicken',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$18.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-  {
-    title: 'Roasted Chicken1',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$22.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-  {
-    title: 'Roasted Chicken2',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$25.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-  {
-    title: 'Roasted Chicken3',
-    description:
-      'Biryani, North Indian, Chinese, Wraps, Lebanese, Hyderabadi, Afghan',
-    price: '$27.50',
-    image:
-      'https://maunikagowardhan.co.uk/wp-content/uploads/2012/08/Tandoori-Chicken1-1024x683.jpg',
-  },
-];
+const MenuItems = ({restaurantName, foods, hideCheckbox}) => {
+  console.log(foods, '🍔');
 
-const MenuItems = ({restaurantName}) => {
   const dispatch = useDispatch();
   const selectItem = (item, checkboxValue) => {
     dispatch({
@@ -76,16 +27,20 @@ const MenuItems = ({restaurantName}) => {
     Boolean(cartItems.find(item => item.title === food.title));
 
   return (
-    <ScrollView>
+    <ScrollView showsVerticalScrollIndicator={false}>
       {foods.map((food, index) => (
         <View key={index}>
           <View style={styles.container}>
-            <BouncyCheckbox
-              iconStyle={{borderColor: 'lightgray', borderRadius: 0}}
-              fillColor="green"
-              onPress={checkboxValue => selectItem(food, checkboxValue)}
-              isChecked={isFoodInCart(cartItems, food)}
-            />
+            {hideCheckbox ? (
+              <></>
+            ) : (
+              <BouncyCheckbox
+                iconStyle={{borderColor: 'lightgray', borderRadius: 0}}
+                fillColor="green"
+                onPress={checkboxValue => selectItem(food, checkboxValue)}
+                isChecked={isFoodInCart(cartItems, food)}
+              />
+            )}
             <FoodInfo food={food} />
             <FoodImage food={food} />
           </View>
@@ -99,7 +54,7 @@ const MenuItems = ({restaurantName}) => {
 const FoodInfo = ({food}) => (
   <View style={{width: 220, justifyContent: 'space-evenly'}}>
     <Text style={styles.title}>{food.title}</Text>
-    <Text>{food.description}</Text>
+    <Text style={styles.description}>{food.description}</Text>
     <Text>{food.price}</Text>
   </View>
 );
@@ -118,8 +73,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 19,
-    fontWeight: '700',
+    fontWeight: '600',
     color: 'black',
+  },
+  description: {
+    fontWeight: '600',
+    fontSize: 14,
   },
   image: {
     width: 100,

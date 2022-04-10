@@ -2,22 +2,32 @@ import React, {useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Modal} from 'react-native';
 import {useSelector} from 'react-redux';
 import OrderItem from './OrderItem';
+import firebase from '../../../firebase';
+import 'firebase/compat/firestore';
 
-export default function ViewCart() {
+export default function ViewCart({navigation}) {
+  const [modalVisible, setModalVisible] = useState(false);
+
   const {items, restaurantName} = useSelector(
     state => state.cartReducer.selectedItems,
   );
-  const [modalVisible, setModalVisible] = useState(false);
-
   const total = items
     .map(item => Number(item.price.replace('$', '')))
     .reduce((prev, current) => prev + current, 0);
 
-  // const totalUSD = total.toLocaleString('en', {
-  //   style: 'currency',
-  //   currency: 'USD',
-  // });
-  const totalUSD = `$${total}`;
+  const totalUSD = total.toLocaleString('en', {
+    style: 'currency',
+    currency: 'USD',
+  });
+
+  const addOrderToFirebase = () => {
+    const db = firebase.firestore();
+    db.collection('orders').add({
+      items: items,
+      restaurantName: restaurantName,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+  };
 
   return (
     <>
@@ -30,12 +40,15 @@ export default function ViewCart() {
           restaurantName={restaurantName}
           items={items}
           totalUSD={totalUSD}
+          addOrderToFirebase={addOrderToFirebase}
+          navigation={navigation}
         />
       </Modal>
       {total ? (
         <View style={{alignItems: 'center'}}>
           <TouchableOpacity
             style={styles.viewCartButton}
+            activeOpacity={0.8}
             onPress={() => setModalVisible(true)}>
             <Text style={[styles.viewCartText, {marginRight: 15}]}>
               View Cart
@@ -51,10 +64,11 @@ export default function ViewCart() {
 }
 
 const CheckOutModalContent = ({
-  setModalVisible,
   restaurantName,
   items,
   totalUSD,
+  addOrderToFirebase,
+  navigation,
 }) => {
   return (
     <View style={styles.modalContainer}>
@@ -71,7 +85,9 @@ const CheckOutModalContent = ({
         </View>
         <TouchableOpacity
           style={styles.checkoutButton}
-          onPress={() => setModalVisible(false)}>
+          onPress={() => {
+            addOrderToFirebase(), navigation.navigate('OrderCompleted');
+          }}>
           <Text style={styles.checkoutButtonTitle}>Checkout</Text>
           <Text style={styles.checkoutButtonPrice}>{totalUSD}</Text>
         </TouchableOpacity>
@@ -83,7 +99,7 @@ const CheckOutModalContent = ({
 const styles = StyleSheet.create({
   viewCartButton: {
     position: 'absolute',
-    width: '70%',
+    width: 300,
     bottom: 10,
     padding: 15,
     backgroundColor: 'black',
@@ -94,7 +110,7 @@ const styles = StyleSheet.create({
   },
   viewCartText: {
     color: 'white',
-    fontSize: 19,
+    fontSize: 17,
   },
   modalContainer: {
     flex: 1,
